@@ -1,82 +1,64 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AMMA20230901.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AMMA20230901.Controllers
 {
-    public class AlumnosController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AlumnosController : ControllerBase
     {
-        // GET: AlumnosController
-        public ActionResult Index()
+        static List<Alumno> alumnos = new List<Alumno>();
+
+        [HttpGet]
+        public IEnumerable<Alumno> Get()
         {
-            return View();
+            return alumnos;
         }
 
-        // GET: AlumnosController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet("{id}")]
+        public Alumno Get(int id)
         {
-            return View();
+            var alumno = alumnos.FirstOrDefault(a => a.Id == id);
+            return alumno;
         }
 
-        // GET: AlumnosController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: AlumnosController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult Post([FromBody] Alumno alumno)
         {
-            try
+            alumnos.Add(alumno);
+            return Ok();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, [FromBody] Alumno alumno)
+        {
+            var existingAlumno = alumnos.FirstOrDefault(a=> a.Id == id);
+            if (existingAlumno != null)
             {
-                return RedirectToAction(nameof(Index));
+                existingAlumno.Nombre = alumno.Nombre;
+                existingAlumno.Apellido = alumno.Apellido;
+                existingAlumno.Matricula = alumno.Matricula;
+                return Ok();
             }
-            catch
+            else
             {
-                return View();
+                return NotFound();
             }
         }
 
-        // GET: AlumnosController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
-            return View();
-        }
-
-        // POST: AlumnosController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            var existingAlumno = alumnos.FirstOrDefault(a => a.Id == id);
+            if (existingAlumno != null)
             {
-                return RedirectToAction(nameof(Index));
+                alumnos.Remove(existingAlumno);
+                return Ok();
             }
-            catch
+            else
             {
-                return View();
-            }
-        }
-
-        // GET: AlumnosController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: AlumnosController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                return NotFound();
             }
         }
     }
